@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { CODES } from '../constants/error';
 import { prisma } from '../lib/prisma';
 import { verifyAccessToken } from '../utils/auth-jwt';
+import jwt from 'jsonwebtoken';
 
 export const authMiddleware = ({ allowNext = false }: { allowNext?: boolean }) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +14,6 @@ export const authMiddleware = ({ allowNext = false }: { allowNext?: boolean }) =
     }
 
     const [type, token] = authHeader.split(' ');
-
     if (type !== 'Bearer' || !token) {
       if (allowNext) return next();
       return res.sendError(CODES.INVALID_TOKEN);
@@ -21,8 +21,6 @@ export const authMiddleware = ({ allowNext = false }: { allowNext?: boolean }) =
 
     try {
       const decoded = verifyAccessToken(token);
-
-      // Vì đã xóa model UserSession, ta tìm trực tiếp User
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
       });
@@ -32,13 +30,16 @@ export const authMiddleware = ({ allowNext = false }: { allowNext?: boolean }) =
         return res.sendError(CODES.UNAUTHORIZED);
       }
 
-      // Gán vào request để sử dụng ở các controller sau
       req.user = user;
-
       return next();
     } catch (error) {
       if (allowNext) return next();
-      return res.sendError(CODES.INVALID_TOKEN);
+
+      if (error instanceof jwt.TokenExpiredError) {
+        return res.sendError(CODES.EXPIRED_TOKEN);
+      }
+      
+      return res.sendError(CODES.INVALID_TOKEN); 
     }
   };
 };

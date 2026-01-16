@@ -1,7 +1,7 @@
-import 'dotenv/config';
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { config } from '../config/index';
-import { PrismaClient } from 'src/generated/prisma/client';
+import "dotenv/config";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from "../generated/prisma/client";
+import { config } from "../config/index";
 
 const adapter = new PrismaMariaDb({
   host: config.DATABASE.host,
