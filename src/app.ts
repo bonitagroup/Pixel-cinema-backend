@@ -4,6 +4,7 @@ import morgan from 'morgan';
 
 import { responseMiddleware } from './middlewares/response';
 import movieRouter from './router/movie';
+import bannerRouter from './router/banner';
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use('/uploads', express.static('uploads'));
 app.use(responseMiddleware);
 
 app.use('/movies', movieRouter);
+app.use('/banners', bannerRouter);
 
 export default app;

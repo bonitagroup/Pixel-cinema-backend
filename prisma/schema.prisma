@@ -21,8 +21,6 @@ model User {
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(0)
 }
 
-// prisma/schema.prisma
-
 model Movie {
   id            Int      @id @default(autoincrement())
   title         String   @db.VarChar(255)
@@ -44,4 +42,18 @@ model Movie {
   updatedAt     DateTime @default(now()) @updatedAt @db.Timestamp(0)
 
   @@index([releaseDate])
+}
+
+model Banner {
+  id          Int      @id @default(autoincrement())
+  imageUrl    String   @db.VarChar(500)
+  title       String?  @db.VarChar(255)
+  link        String?  @db.VarChar(500)
+  order       Int      @default(0) 
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@index([isActive, order])
 }
